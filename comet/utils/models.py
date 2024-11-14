@@ -1,7 +1,6 @@
 import os
 import random
 import string
-import json
 
 from typing import List, Optional
 from databases import Database
@@ -28,7 +27,7 @@ class AppSettings(BaseSettings):
     INDEXER_MANAGER_URL: Optional[str] = "http://127.0.0.1:9117"
     INDEXER_MANAGER_API_KEY: Optional[str] = None
     INDEXER_MANAGER_TIMEOUT: Optional[int] = 30
-    INDEXER_MANAGER_INDEXERS: List[str] = Field(default_factory=lambda: ["EXAMPLE1_CHANGETHIS", "EXAMPLE2_CHANGETHIS"])
+    INDEXER_MANAGER_INDEXERS: List[str] = ["EXAMPLE1_CHANGETHIS", "EXAMPLE2_CHANGETHIS"]
     GET_TORRENT_TIMEOUT: Optional[int] = 5
     ZILEAN_URL: Optional[str] = None
     ZILEAN_TAKE_FIRST: Optional[int] = 500
@@ -42,21 +41,6 @@ class AppSettings(BaseSettings):
     PROXY_DEBRID_STREAM_DEBRID_DEFAULT_SERVICE: Optional[str] = "realdebrid"
     PROXY_DEBRID_STREAM_DEBRID_DEFAULT_APIKEY: Optional[str] = None
     TITLE_MATCH_CHECK: Optional[bool] = True
-
-    @field_validator("INDEXER_MANAGER_INDEXERS", pre=True)
-    def parse_indexer_manager_indexers(cls, value):
-        if isinstance(value, str):
-            try:
-                # Try to parse as JSON array
-                parsed_value = json.loads(value)
-                if isinstance(parsed_value, list):
-                    return parsed_value
-            except json.JSONDecodeError:
-                # If parsing as JSON fails, treat it as a comma-separated string
-                return [v.strip() for v in value.split(",")]
-        elif isinstance(value, list):
-            return value
-        raise ValueError("INDEXER_MANAGER_INDEXERS must be a JSON array or comma-separated string.")
 
     @field_validator("DASHBOARD_ADMIN_PASSWORD")
     def set_dashboard_admin_password(cls, v, values):
